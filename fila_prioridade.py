@@ -26,7 +26,7 @@ class FilaPrioridade:
     
     # retorna True se a fila de prioridade está cheia, False caso contrário
     def is_full(self) -> bool:
-        if self.__qtdItens == self.__capacidade:
+        if self.__qtdItens >= self.__capacidade:
             return True
         else:
             return False
@@ -45,27 +45,24 @@ class FilaPrioridade:
     # se a fila de prioridade estiver cheia, lança uma exceção: raise Exception("mensagem de erro")
     def add(self, valor, prioridade) -> bool:
         novo_no = No(valor, prioridade)
+
         if self.is_full():
             raise Exception("A fila de prioridade está cheia.")
         elif self.is_empty():
             self.__inicio = novo_no
+        elif prioridade > self.__inicio.prioridade:
             novo_no.prox = self.__inicio
-            self.__qtdItens += 1
-            return True
-        else:
+            self.__inicio = novo_no
+        else:    
             apontador = self.__inicio
-            if novo_no.prioridade > self.__inicio.prioridade:
-                novo_no.prox = self.__inicio
-                self.__inicio = novo_no
-                self.__qtdItens += 1
-                return True
-            else:
-                while novo_no.prioridade <= apontador.prioridade and apontador is not self.__inicio:
-                    apontador = apontador.prox
-                novo_no = apontador.prox
-                apontador = novo_no
-                self.__qtdItens += 1
-                return True
+            while apontador.prox and prioridade <= apontador.prox.prioridade:
+                apontador = apontador.prox
+
+            novo_no.prox = apontador.prox
+            apontador.prox = novo_no
+
+        self.__qtdItens += 1    
+        return True
 
     
     # remove o primeiro item da fila de prioridade, caso não esteja vazia, e retorna o Nó
